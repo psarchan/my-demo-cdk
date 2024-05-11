@@ -1,0 +1,23 @@
+name: deploy
+on:
+  push:
+   branches:
+    - main
+
+env:
+  account_id: 637423635522
+  region: us-east-1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
+      - name: configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::{{env.account-id}}:role/deploy-role
+          aws-region: us-east-1
