@@ -4,9 +4,9 @@ on:
    branches:
     - main
 
-env:
-  account_id: 637423635522
-  region: us-east-1
+# env:
+#   account_id: 637423635522
+#   region: us-east-1
 
 jobs:
   build:
@@ -19,5 +19,5 @@ jobs:
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::637423635522:role/deploy-role
+          role-to-assume: arn:aws:iam::590183968563:role/centraal-oidc-role
           aws-region: us-east-1
