@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+
+      - name: Install AWS CLI
+        run: sudo apt-get update && sudo apt-get install -y awscli
         
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -25,10 +28,16 @@ jobs:
           role-to-assume: arn:aws:iam::590183968563:role/centraal-oidc-role
           aws-region: us-east-1
           role-session-name: github-session
+      
+      - name: assume role in cross account
+        run: aws sts assume-role --role-arn arn:aws:iam::637423635522:role/deploy-role --role-session-name github-session-deploy > assume_role_output.json
+
+      - name: Set AWS credentials
+        run: |
+          export AWS_ACCESS_KEY_ID=$(cat assume_role_output.json | jq -r '.Credentials.AccessKeyId')
+          export AWS_SECRET_ACCESS_KEY=$(cat assume_role_output.json | jq -r '.Credentials.SecretAccessKey')
+          export AWS_SESSION_TOKEN=$(cat assume_role_output.json | jq -r '.Credentials.SessionToken')
+
 
       - name: list s3 bucket in cross account
         run: aws s3 ls
-        env:
-          role-to-assume: arn:aws:iam::637423635522:role/deploy-role
-          aws-region: us-east-1
-          role-session-name: github-session-deploy
