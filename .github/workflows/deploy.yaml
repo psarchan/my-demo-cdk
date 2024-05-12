@@ -85,11 +85,10 @@ jobs:
       #     IMAGE_TAG=$(aws ssm get-parameter --name "/my/ecr/build/tag" --query "Parameter.Value" --output text)
       #     echo "::set-output name=image::$IMAGE_TAG"
       - name: ECR Login
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry: 590183968563.dkr.ecr.us-east-2.amazonaws.com
-          repository: my-cdk-build-demo
+        run: |
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 590183968563.dkr.ecr.us-east-2.amazonaws.com
+
 
       - name: Pull ECR Image
         run: |
-          docker image pull 
+          docker image pull 590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo:35f8590
