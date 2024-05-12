@@ -23,8 +23,7 @@ func NewLambdaStack(scope constructs.Construct, id string, props *LambdaStackPro
 	// create lambda function from ecr image
 	awslambda.NewDockerImageFunction(stack, jsii.String("HandleRequest"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("HandleRequest"),
-		Code: awslambda.DockerImageCode_FromEcr(&awslambda.EcrImageCodeProps{
-			Repository: repo,
+		Code: awslambda.DockerImageCode_FromEcr(repo,&awslambda.EcrImageCodeProps{
 			TagOrDigest: jsii.String("latest"),
 		}),
 		MemorySize: jsii.Number(1024),
