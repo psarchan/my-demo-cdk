@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
+	"github.com/aws/aws-cdk-go/aws-cdk/v2/awsecr"
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -18,17 +19,15 @@ func NewLambdaStack(scope constructs.Construct, id string, props *LambdaStackPro
 		sprops = props.StackProps
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
-	// repo := awslambda.NewEcrRepository(stack, jsii.String("590183968563.dkr.ecr.us-east-2.amazonaws.com/"), &awslambda.EcrRepositoryProps{
-	// 	RepositoryName: jsii.String("my-cdk-build-demo"),
-	// })
+	repo := awsecr.Repository_FromRepositoryName(stack, jsii.String("MyRepo"), jsii.String("my-cdk-build-demo"))
 	// create lambda function from ecr image
 	awslambda.NewDockerImageFunction(stack, jsii.String("HandleRequest"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("HandleRequest"),
-		MemorySize: jsii.Number(1024),
-		Timeout: awscdk.Duration_Seconds(jsii.Number(30)),
-		Code: awslambda.DockerImageCode_FromEcr(jsii.String("590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo"), &awslambda.EcrImageCodeProps{
-			ImageTag: jsii.String("412c4fe"),
+		Code: awslambda.DockerImageCode_FromEcr(&awslambda.EcrImageCodeProps{
+			Repository: repo,
+			TagOrDigest: jsii.String("latest"),
 		}),
+		MemorySize: jsii.Number(1024),
 		Architecture: awslambda.Architecture_ARM_64(),
 	})
 
