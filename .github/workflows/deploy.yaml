@@ -92,3 +92,8 @@ jobs:
       - name: Pull ECR Image
         run: |
           docker image pull 590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo:35f8590
+
+      - name: cdk synth
+        run: |
+          cd lambda
+          cdk synth
