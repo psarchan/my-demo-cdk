@@ -86,4 +86,4 @@ jobs:
       #     echo "::set-output name=image::$IMAGE_TAG"
       - name: Pull ECR Image
         run: |
-          docker pull ${{ needs.build.outputs.image }}
+          docker pull 590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo:35f8590
