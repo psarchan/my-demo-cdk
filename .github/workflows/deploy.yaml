@@ -110,3 +110,8 @@ jobs:
         run: |
           cd lambda
           cdk synth
+        
+      - name: cdk deploy
+        run: |
+          cd lambda
+          cdk deploy
