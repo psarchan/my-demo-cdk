@@ -17,6 +17,19 @@ func NewLambdaStack(scope constructs.Construct, id string, props *LambdaStackPro
 		sprops = props.StackProps
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
+	repo := awslambda.NewEcrRepository(stack, jsii.String(""), &awslambda.EcrRepositoryProps{
+		RepositoryName: jsii.String("lambda-repository"),
+	})
+	// create lambda function from ecr image
+	awslambda.NewDockerImageFunction(stack, jsii.String("HandleRequest"), &awslambda.DockerImageFunctionProps{
+		FunctionName: jsii.String("HandleRequest"),
+		MemorySize: jsii.Number(1024),
+		Timeout: awscdk.Duration_Seconds(jsii.Number(30)),
+		Code: awslambda.DockerImageCode_FromEcr(repo, &awslambda.EcrImageCodeProps{
+		}),
+		Architecture: awslambda.Architecture_ARM_64(),
+	})
+
 
 	
 	return stack
