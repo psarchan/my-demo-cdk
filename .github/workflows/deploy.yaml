@@ -53,12 +53,8 @@ jobs:
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
       - name: Update IMAGE_TAG in SSM Parameter Store
-        uses: aws-actions/amazon-ssm-put-parameter@v1
-        with:
-          name: /my/ecr/build/tag
-          value: ${{ steps.build-image.outputs.image }}
-          type: String
-          overwrite: true
+        run: |
+          aws ssm put-parameter --name "/my/ecr/build/tag" --value "${{ steps.build-image.outputs.image }}" --type "String" --overwrite
       
       # - name: assume role in cross account
       #   run: aws sts assume-role --role-arn arn:aws:iam::637423635522:role/deploy-role --role-session-name github-session-deploy > assume_role_output.json
