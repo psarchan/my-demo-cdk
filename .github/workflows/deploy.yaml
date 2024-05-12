@@ -58,7 +58,7 @@ jobs:
   
   deploy:
     runs-on: ubuntu-latest
-    permission:
+    permissions:
       id-token: write
       contents: read
     needs: build
