@@ -19,13 +19,13 @@ func NewLambdaStack(scope constructs.Construct, id string, props *LambdaStackPro
 		sprops = props.StackProps
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
-	repo := awsecr.Repository_FromRepositoryName(stack, jsii.String("MyRepo"), jsii.String("my-cdk-build-demo"))
+	//repo = "590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo"
+	crossAccountRepositoryArn := jsii.String("590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo")
 	// create lambda function from ecr image
 	awslambda.NewDockerImageFunction(stack, jsii.String("HandleRequest"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("HandleRequest"),
-		Code: awslambda.DockerImageCode_FromEcr(repo,&awslambda.EcrImageCodeProps{
-			TagOrDigest: jsii.String("latest"),
-		}),
+		Code: awslambda.DockerImageCode_FromRepository(awsecr.Repository_FromRepositoryArn(stack, jsii.String("ECRImage"), &crossAccountRepositoryArn)),
+		Timeout: awscdk.Duration_Seconds(jsii.Number(300)),
 		MemorySize: jsii.Number(1024),
 		Architecture: awslambda.Architecture_ARM_64(),
 	})
