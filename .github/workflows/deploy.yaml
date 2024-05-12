@@ -78,6 +78,19 @@ jobs:
           role-to-assume: arn:aws:iam::637423635522:role/github_deploy_role
           aws-region: us-east-1
           role-session-name: github-session
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      
+      - name: Install CDK
+        run: npm install -g aws-cdk
+
+      - name: Install go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.22
+
       
       # - name: Pull IMAGE_TAG from SSM Parameter Store
       #   id: get-image-tag
