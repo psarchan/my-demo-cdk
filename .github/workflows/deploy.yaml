@@ -32,7 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::590183968563:role/centraal-oidc-role
-          aws-region: us-east-1
+          aws-region: us-east-2
           role-session-name: github-session
 
       - name: Login to Amazon ECR
