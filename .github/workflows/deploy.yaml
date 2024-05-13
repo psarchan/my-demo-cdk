@@ -19,100 +19,116 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: set up QEMU
-        uses: docker/setup-qemu-action@v3
+      # - name: set up QEMU
+      #   uses: docker/setup-qemu-action@v3
 
-      - name: set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # - name: set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
 
       - name: Install AWS CLI
         run: sudo apt-get update && sudo apt-get install -y awscli
-        
+      
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::590183968563:role/centraal-oidc-role
           aws-region: us-east-2
-          role-session-name: github-session
+          role-session-name: github-session1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: List S3 buckets
+        run: aws s3 ls
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: my-cdk-build-demo
-          COMMIT_HASH: ${{ github.sha }}
-        run: |
-          IMAGE_TAG=$( echo $COMMIT_HASH | cut -c 1-7)
-          cd my-lambda
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-      - name: Update IMAGE_TAG in SSM Parameter Store
-        run: |
-          aws ssm put-parameter --name "/my/ecr/build/tag" --value "${{ steps.build-image.outputs.image }}" --type "String" --overwrite
-  
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    needs: build
-    environment: dev
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: set up QEMU
-        uses: docker/setup-qemu-action@v3
-      
-      - name: set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::637423635522:role/github_deploy_role
           aws-region: us-east-1
-          role-session-name: github-session
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-      
-      - name: Install CDK
-        run: npm install -g aws-cdk
-
-      - name: Install go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.22
-
-      
-      # - name: Pull IMAGE_TAG from SSM Parameter Store
-      #   id: get-image-tag
-      #   run: |
-      #     IMAGE_TAG=$(aws ssm get-parameter --name "/my/ecr/build/tag" --query "Parameter.Value" --output text)
-      #     echo "::set-output name=image::$IMAGE_TAG"
-      - name: ECR Login
-        run: |
-          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 590183968563.dkr.ecr.us-east-2.amazonaws.com
-
-
-      - name: Pull ECR Image
-        run: |
-          docker image pull 590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo:35f8590
-
-      - name: cdk synth
-        run: |
-          cd lambda
-          cdk synth
         
-      - name: cdk deploy
-        run: |
-          cd lambda
-          cdk deploy --require-approval never
+  #     - name: configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v3
+  #       with:
+  #         role-to-assume: arn:aws:iam::590183968563:role/centraal-oidc-role
+  #         aws-region: us-east-2
+  #         role-session-name: github-session
+
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v2
+
+  #     - name: Build, tag, and push image to Amazon ECR
+  #       id: build-image
+  #       env:
+  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  #         ECR_REPOSITORY: my-cdk-build-demo
+  #         COMMIT_HASH: ${{ github.sha }}
+  #       run: |
+  #         IMAGE_TAG=$( echo $COMMIT_HASH | cut -c 1-7)
+  #         cd my-lambda
+  #         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+  #         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+  #         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  #     - name: Update IMAGE_TAG in SSM Parameter Store
+  #       run: |
+  #         aws ssm put-parameter --name "/my/ecr/build/tag" --value "${{ steps.build-image.outputs.image }}" --type "String" --overwrite
+  
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   needs: build
+  #   environment: dev
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2
+
+  #     - name: set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+      
+  #     - name: set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+      
+  #     - name: configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v3
+  #       with:
+  #         role-to-assume: arn:aws:iam::637423635522:role/github_deploy_role
+  #         aws-region: us-east-1
+  #         role-session-name: github-session
+  #     - name: Install Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16.x'
+      
+  #     - name: Install CDK
+  #       run: npm install -g aws-cdk
+
+  #     - name: Install go
+  #       uses: actions/setup-go@v3
+  #       with:
+  #         go-version: 1.22
+
+      
+  #     # - name: Pull IMAGE_TAG from SSM Parameter Store
+  #     #   id: get-image-tag
+  #     #   run: |
+  #     #     IMAGE_TAG=$(aws ssm get-parameter --name "/my/ecr/build/tag" --query "Parameter.Value" --output text)
+  #     #     echo "::set-output name=image::$IMAGE_TAG"
+  #     - name: ECR Login
+  #       run: |
+  #         aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 590183968563.dkr.ecr.us-east-2.amazonaws.com
+
+
+  #     - name: Pull ECR Image
+  #       run: |
+  #         docker image pull 590183968563.dkr.ecr.us-east-2.amazonaws.com/my-cdk-build-demo:35f8590
+
+  #     - name: cdk synth
+  #       run: |
+  #         cd lambda
+  #         cdk synth
+        
+  #     - name: cdk deploy
+  #       run: |
+  #         cd lambda
+  #         cdk deploy --require-approval never
