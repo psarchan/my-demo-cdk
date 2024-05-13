@@ -62,6 +62,7 @@ jobs:
       id-token: write
       contents: read
     needs: build
+    environment: dev
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
