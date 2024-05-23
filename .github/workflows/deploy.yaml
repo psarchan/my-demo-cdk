@@ -31,8 +31,8 @@ jobs:
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::590183968563:role/centraal-oidc-role
-          aws-region: us-east-2
+          role-to-assume: arn:aws:iam::${{ vars.CENTRAL_AWS_ACCOUNT_ID }}:role/${{ vars.CENTRAL_ROLE }}
+          aws-region: ${{ vars.CENTRAL_AWS_REGION }}
           role-session-name: github-session1
 
       - name: List S3 buckets
